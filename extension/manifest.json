@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "SIS server-side autologin",
+  "version": "0.5",
+  "permissions": [
+    "cookies",
+    "storage",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "*://is.cuni.cz/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
+  }
+}
