@@ -1,0 +1,9 @@
+services:
+  autologin:
+    build: .
+    container_name: sis-autologin
+    restart: unless-stopped
+    ports:
+      - "7791:7791"
+    env_file:
+      - .env

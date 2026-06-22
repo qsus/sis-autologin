@@ -103,8 +103,8 @@ if __name__ == "__main__":
     threading.Thread(target=session_renewer, daemon=True).start()
 
     # Server
-    server = http.server.HTTPServer(("127.0.0.1", PORT), TokenHandler)
-    print(f"Serving on 127.0.0.1:{PORT}")
+    server = http.server.HTTPServer(("0.0.0.0", PORT), TokenHandler)
+    print(f"Serving on 0.0.0.0:{PORT}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

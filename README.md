@@ -19,6 +19,7 @@ This tool maintains a valid session on your server. Whenever you access SIS from
 1. Enable 2FA in [ldap](https://ldapuser.cuni.cz/idportal/mfa). When scanning the QR code, copy the seed and save it to `.env` as `OTP_SECRET`.
 1. Fill in the rest of the `.env` file. Create your own `SECRET` (used for authentication between the extension and the server).
 1. Run the script (TODO: in tmux, as a service or inside docker).
+  - Docker: `docker compose up -d --build`
 1. Optional: set up a reverse proxy.
 1. Test the connection. Example: `curl http://localhost:7791/ -H "Authorization: Bearer cb70f221-f961-43bf-bf7e-6af598aa4a20"` (If you get Binary output warning, you are seeing the image returned on incorrect authentication.)
 1. Install the browser extension. (TODO: how?)
