@@ -14,6 +14,12 @@ This tool maintains a valid session on your server. Whenever you access SIS from
 - Something could break if a new session is created on the server just as you are clicking a link.
 - If your server is down, you need to log in manually. You will need another way to obtain OTP.
 
+## Details
+This extension does basically three things:
+1. Redirects you from `is.cuni.cz` to `is.cuni.cz/studium/`
+2. Fetches a valid session cookie from the server
+3. Fills in CAS login forms (for other services or if you don't have a server)
+
 ## Setup
 1. Get your own server (VPS or home server accessible from the internet).
 1. Enable 2FA in [ldap](https://ldapuser.cuni.cz/idportal/mfa). When scanning the QR code, copy the seed and save it to `.env` as `OTP_SECRET`.
@@ -24,6 +30,7 @@ This tool maintains a valid session on your server. Whenever you access SIS from
 1. Test the connection. Example: `curl http://localhost:7791/ -H "Authorization: Bearer cb70f221-f961-43bf-bf7e-6af598aa4a20"` (If you get Binary output warning, you are seeing the image returned on incorrect authentication.)
 1. Install the [firefox](https://addons.mozilla.org/en-US/firefox/addon/sis-server-side-autologin/) browser extension (when it gets available).
 1. Enable the extension and fill in the server URL and secret.
+1. For CAS autologin, open the extension popup and set whether to register the device, the device name, OTP seed, username, and password.
 1. Enjoy SIS autologin.
 
 ## TODO

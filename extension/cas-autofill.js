@@ -1,6 +1,14 @@
-(function () {
+(async function () {
 	'use strict';
 	
+	const { registerDevice = false, deviceName = '', otpSeed = '', username = '', password = '' } = await chrome.storage.local.get([
+		'registerDevice',
+		'deviceName',
+		'otpSeed',
+		'username',
+		'password'
+	]);
+
 	const form = document.querySelector('form[id="fm1"]');
 	// login page
 	const usernameInput = document.querySelector('input[id="username"]');
@@ -15,10 +23,6 @@
 	const deviceNameInput = document.querySelector('input[id="deviceName"]');
 	const registerButton = document.querySelector('button[accesskey="s"]');
 	const skipButton = document.querySelector('button[accesskey="k"]');
-
-	const registerDevice = false; // either register or skip
-	const deviceName = "TODO"; // if registering, what name to give the device
-
 
 	const OTPEngine = (() => {
 		function base32ToBuf(base32) {
@@ -103,8 +107,7 @@
 	}
 
 	function autofillOTP() {
-		const seed = "TODO";
-		OTPEngine.getOTP(seed).then(token => {
+		OTPEngine.getOTP(otpSeed).then(token => {
 			tokenInput.value = token;
 			console.log("Autologin: filled OTP:", token);
 			submitButton.click();
@@ -121,17 +124,17 @@
 		setAutologin(true);
 
 		// OTP page
-		if (tokenInput) {
+		if (tokenInput && otpSeed) {
 			autofillOTP();
 			return;
 		}
 
 		// First login page
 		if (!usernameInput.value) {
-			usernameInput.value = "TODO";
+			usernameInput.value = username;
 		}
 		if (!passwordInput.value) {
-			passwordInput.value = "TODO";
+			passwordInput.value = password;
 		}
 		loginButton.click();
 	});
