@@ -8,7 +8,8 @@
     "webNavigation"
   ],
   "host_permissions": [
-    "*://is.cuni.cz/*"
+    "*://is.cuni.cz/*",
+    "*://cas.cuni.cz/*"
   ],
   "action": {
     "default_popup": "popup.html"
@@ -24,5 +25,14 @@
         "required": ["none"]
       }
     }
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://cas.cuni.cz/*"
+      ],
+      "js": ["cas-autofill.js"],
+      "run_at": "document_end"
+    }
+  ]
 }
