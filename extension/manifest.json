@@ -1,51 +1,50 @@
 {
-  "manifest_version": 3,
-  "name": "SIS server-side autologin",
-  "version": "0.9",
-  "icons": {
-    "32": "icon32.png"
-  },
-  "permissions": [
-    "declarativeNetRequest",
-    "cookies",
-    "storage",
-    "webNavigation"
-  ],
-  "host_permissions": [
-    "*://is.cuni.cz/*",
-    "*://cas.cuni.cz/*"
-  ],
-  "action": {
-    "default_popup": "popup.html"
-  },
-  "background": {
-    "service_worker": "background.js",
-    "scripts": ["background.js"]
-  },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "sis-autologin@matfyz.dev",
-      "data_collection_permissions": {
-        "required": ["none"]
-      }
-    }
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "*://cas.cuni.cz/*"
-      ],
-      "js": ["cas-autofill.js"],
-      "run_at": "document_end"
-    }
-  ],
-  "declarative_net_request": {
-    "rule_resources": [
-      {
-        "id": "ruleset_redirect",
-        "enabled": true,
-        "path": "rules.json"
-      }
-    ]
-  }
+	"manifest_version": 3,
+	"name": "SIS server-side autologin",
+	"version": "0.9",
+	"icons": {
+		"32": "icon32.png"
+	},
+	"permissions": [
+		"declarativeNetRequest",
+		"cookies",
+		"storage"
+	],
+	"host_permissions": [
+		"*://is.cuni.cz/*",
+		"*://cas.cuni.cz/*"
+	],
+	"action": {
+		"default_popup": "popup.html"
+	},
+	"background": {
+		"service_worker": "background.js",
+		"scripts": ["background.js"]
+	},
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "sis-autologin@matfyz.dev",
+			"data_collection_permissions": {
+				"required": ["none"]
+			}
+		}
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"*://cas.cuni.cz/*"
+			],
+			"js": ["cas-autofill.js"],
+			"run_at": "document_end"
+		}
+	],
+	"declarative_net_request": {
+		"rule_resources": [
+			{
+				"id": "ruleset_redirect",
+				"enabled": true,
+				"path": "rules.json"
+			}
+		]
+	}
 }
