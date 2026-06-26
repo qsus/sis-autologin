@@ -36,4 +36,3 @@ This extension does basically three things:
 ## TODO
 - caching: script will know when the next session will be created, and will use this as cache validity
 - .service file
-- cas autologin, but probably otp only, because otherwise I would have to somehow store the password

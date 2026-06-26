@@ -47,22 +47,11 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     if (data.php_sessid) await chrome.cookies.set({ ...cookieBase, name: 'PHPSESSID', value: data.php_sessid });
 
     const url = new URL(details.url);
-    let redirectNeeded = false;
-
-    // Redirect from / to /studium/
-    if (url.pathname === '/') {
-        url.pathname = '/studium/';
-        redirectNeeded = true;
-    }
 
     // Add session ID to URL
     if (url.searchParams.get('id') !== data.php_sessid) {
         url.searchParams.set('id', data.php_sessid);
-        redirectNeeded = true;
-    }
-
-    // If required, redirect to the modified URL
-    if (redirectNeeded) {
         chrome.tabs.update(details.tabId, { url: url.toString() });
     }
+
 }, { url: [{ hostEquals: 'is.cuni.cz' }] });
