@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "url": "https://is.cuni.cz/studium/"
+      }
+    },
+    "condition": {
+      "regexFilter": "^https?://is\\.cuni\\.cz/?(\\?.*)?$",
+      "resourceTypes": ["main_frame"]
+    }
+  }
+]

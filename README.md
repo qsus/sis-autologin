@@ -16,9 +16,9 @@ This tool maintains a valid session on your server. Whenever you access SIS from
 
 ## Details
 This extension does basically three things:
-1. Redirects you from `is.cuni.cz` to `is.cuni.cz/studium/`
-2. Fetches a valid session cookie from the server
-3. Fills in CAS login forms (for other services or if you don't have a server)
+1. Redirects you from `is.cuni.cz` to `is.cuni.cz/studium/` (declarativeNetRequest, `rules.json`)
+2. Fetches a valid session cookie from the server (onBeforeNavigate, `background.js`)
+3. Fills in CAS login forms (for other services or if you don't have a server) (content_scripts, `cas-autofill.js`)
 
 ## Setup
 1. Get your own server (VPS or home server accessible from the internet).

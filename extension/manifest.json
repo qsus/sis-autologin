@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "SIS server-side autologin",
-  "version": "0.8",
+  "version": "0.9",
   "permissions": [
+    "declarativeNetRequest",
     "cookies",
     "storage",
     "webNavigation"
@@ -34,5 +35,14 @@
       "js": ["cas-autofill.js"],
       "run_at": "document_end"
     }
-  ]
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_redirect",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  }
 }
