@@ -2,6 +2,9 @@
   "manifest_version": 3,
   "name": "SIS server-side autologin",
   "version": "0.9",
+  "icons": {
+    "32": "icon32.png"
+  },
   "permissions": [
     "declarativeNetRequest",
     "cookies",
