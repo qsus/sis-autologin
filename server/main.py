@@ -17,7 +17,7 @@ PASS = os.getenv("PASS")
 # Auth from user
 SECRET = os.getenv("SECRET")
 # Other
-PORT = os.getenv("PORT", 7791)
+PORT = int(os.getenv("PORT", 7791))
 UPDATE_INTERVAL = int(os.getenv("INTERVAL", 3600))
 
 def fetch_session_data():
@@ -47,9 +47,18 @@ def fetch_session_data():
         }
 
 session_data = {}
+session_updated_at = 0
+
 def update_session_data():
-    global session_data
+    global session_data, session_updated_at
     session_data = fetch_session_data()
+    session_updated_at = time.time()
+
+def cache_max_age():
+    if not session_updated_at:
+        return 0
+
+    return max(0, int(session_updated_at + UPDATE_INTERVAL - time.time()))
 
 def session_renewer():
     """Periodically obtain new session data"""
@@ -59,7 +68,7 @@ def session_renewer():
             update_session_data()
         except Exception as e:
             print(f"Error obtaining new session data: {e}")
-        time.sleep(3600)
+        time.sleep(UPDATE_INTERVAL)
 
 class TokenHandler(http.server.BaseHTTPRequestHandler):
     def do_OPTIONS(self):
@@ -88,7 +97,8 @@ class TokenHandler(http.server.BaseHTTPRequestHandler):
 
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
-        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+        self.send_header("Cache-Control", f"private, max-age={cache_max_age()}, must-revalidate")
+        self.send_header("Vary", "Authorization")
         self.send_header("Content-Length", str(len(response_data)))
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
