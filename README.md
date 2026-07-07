@@ -31,6 +31,7 @@ This extension does basically three things:
 1. Install the [firefox](https://addons.mozilla.org/en-US/firefox/addon/sis-server-side-autologin/) browser extension (when it gets available).
 1. Enable the extension and fill in the server URL and secret.
 1. For CAS autologin, open the extension popup and set whether to register the device, the device name, OTP seed, username, and password.
+   - You may want to skip the password (and username) for security reasons and instead fill them manually or from your browser manager before clicking the autofill button.
 1. Enjoy SIS autologin.
 
 ## TODO
