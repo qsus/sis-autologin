@@ -1,43 +1,28 @@
 async function getSession() {
 	// Check settings and the master toggle switch
-	const { url, secret, cache, enabled } = await chrome.storage.local.get(['url', 'secret', 'cache', 'enabled']);
+	const { url, secret, enabled } = await chrome.storage.local.get(['url', 'secret', 'enabled']);
 	if (!enabled || !url || !secret) return null;
-	
-	// Return from cache if valid
-	if (cache && cache.validUntil && Date.now() < cache.validUntil) {
-		console.log("Using cached session data");
-		return cache.data;
-	}
 	
 	try {
 		// Fetch session data from the server
 		const res = await fetch(url, {
 			headers: {'Authorization': `Bearer ${secret}` }
 		});
-		if (!res.ok) return null;
-		const data = await res.json();
-		
-		/* Ignore caching, browser should handle it for us
-		// Store in cache
-		let validUntil = 0;
-		if (data.ttl) {
-		validUntil = Date.now() + (data.ttl * 1000);
-		} else if (data.expiresAt) {
-		validUntil = data.expiresAt;
+		if (!res.ok) {
+			console.error("Fetch response error.", res.status, res.statusText);
+			return null;
 		}
-		await chrome.storage.local.set({ cache: { data, validUntil } });
-		*/
-		
+
+		// Successful fetch
+		const data = await res.json();
 		return data;
 	} catch (err) {
-		console.error("Fetch failed (CORS? Incorrect/missing url or secret? Server down?)", err);
+		console.error("Fetch failed. (CORS? Incorrect/missing url or secret? Server down?)", err);
 		return null;
 	}
 }
 
 chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
-	if (details.frameId !== 0) return;
-	
 	const data = await getSession();
 	if (!data) return; // Extension disabled or failed
 	
@@ -53,5 +38,4 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
 		url.searchParams.set('id', data.php_sessid);
 		chrome.tabs.update(details.tabId, { url: url.toString() });
 	}
-	
 }, { url: [{ hostEquals: 'is.cuni.cz' }] });
