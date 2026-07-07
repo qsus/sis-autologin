@@ -17,7 +17,7 @@ PASS = os.getenv("PASS")
 # Auth from user
 SECRET = os.getenv("SECRET")
 # Other
-PORT = 7791
+PORT = os.getenv("PORT")
 
 def fetch_session_data():
     """Emulate login with OTP and return session data"""
