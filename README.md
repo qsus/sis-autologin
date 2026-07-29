@@ -34,6 +34,15 @@ This extension does basically three things:
    - You may want to skip the password (and username) for security reasons and instead fill them manually or from your browser manager before clicking the autofill button.
 1. Enjoy SIS autologin.
 
+## Demo
+This is how quick it is... Only one click, everything else is automated.
+
+https://github.com/user-attachments/assets/4d362464-2f41-46a7-a470-ffd878733f9b
+
+SIS load with cleared browser cache, and then with cache (equivalent to opening a new tab).
+
+https://github.com/user-attachments/assets/4b87b310-fcec-422c-99b8-6d35ac3f6be5
+
 ## TODO
 - caching: script will know when the next session will be created, and will use this as cache validity
 - .service file
