@@ -48,3 +48,8 @@ https://github.com/user-attachments/assets/4b87b310-fcec-422c-99b8-6d35ac3f6be5
 ## TODO
 - caching: script will know when the next session will be created, and will use this as cache validity
 - .service file
+
+## Issues
+- direct download links like https://is.cuni.cz/studium/?ABc01DEfG are redirected to SIS main page
+- on phone, going to is.cuni.cz does not trigger the autologin after redirecting; you have to reload the page to trigger it
+- potential race condition if only some of the authentication data was up to date?
