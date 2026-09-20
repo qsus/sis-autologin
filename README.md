@@ -49,6 +49,9 @@ https://github.com/user-attachments/assets/4b87b310-fcec-422c-99b8-6d35ac3f6be5
 - instead of (or in addition to) `SECRET` (which can be leaked without https proxy) to authenticate the client, the server will just send the encrypted payload to everyone, but only people with a correct `KEY` will be able to decrypt it
 - caching: script will know when the next session will be created, and will use this as cache validity
 - .service file
+- add option to remotely renew session
+- add option to disable cache
+- tell browsers not to send OPTIONS request to verify cache validity
 
 ## Issues
 - direct download links like https://is.cuni.cz/studium/?ABc01DEfG are redirected to SIS main page
