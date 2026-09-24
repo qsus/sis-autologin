@@ -134,7 +134,7 @@ class TokenHandler(http.server.BaseHTTPRequestHandler):
             response_data = self.cipher.encrypt(response_data)
 
         self.send_response(200)
-        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Type", "application/octet-stream")
         self.send_header("Cache-Control", f"private, max-age={cache_max_age()}, must-revalidate")
         self.send_header("Vary", "Authorization")
         self.send_header("Content-Length", str(len(response_data)))
