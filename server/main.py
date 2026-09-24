@@ -20,13 +20,15 @@ SECRET = os.getenv("SECRET")
 PORT = int(os.getenv("PORT", 7791))
 UPDATE_INTERVAL = int(os.getenv("INTERVAL", 3600))
 
-def fetch_session_data():
-    """Emulate login with OTP and return session data"""
-    with sync_playwright() as p: 
+def fetch_data():
+    """Emulate login with OTP and return data for SIS and Canteen"""
+    updated = time.time()
+    with sync_playwright() as p:
+        ## LOGIN TO CAS
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
         # First login screen
-        page.goto("https://is.cuni.cz/studium/index.php?sso")
+        page.goto("https://cas.cuni.cz/cas/login")
         page.fill("input[name='username']", USER)
         page.fill("input[name='password']", PASS)
         page.get_by_role("button", name="PŘIHLÁSIT").click()
@@ -39,43 +41,62 @@ def fetch_session_data():
         # Remember device screen
         page.get_by_role("button", name="Přeskočit").click()
 
-        # Read data
-        cookies = {c["name"]: c["value"] for c in page.context.cookies()}
+        ## SIS
+        page.goto("https://is.cuni.cz/studium/index.php?sso")
+        sis_cookies = {c["name"]: c["value"] for c in page.context.cookies()}
+
+        ## Canteen
+        page.goto("https://kam-septim-fe.is.cuni.cz/ext-login")
+        # Wait until the auth data appears in localStorage
+        canteen_local_storage = page.wait_for_function(
+            """() => {
+                for (const [key, raw] of Object.entries(localStorage)) {
+                    if (key.startsWith("septim-canteen")) {
+                        try {
+                            const info = JSON.parse(raw)?.userSystemInfo;
+                            if (info?.auth?.login && info?.authentication?.sessionToken) {
+                                return { [key]: raw };
+                            }
+                        } catch {}
+                    }
+                }
+                return false;
+            }""",
+            timeout=15000,
+        ).json_value() # {"septim-canteen-1.25.18~~JS-1304": "<object as string>"}
+
         return {
-            "idc": cookies.get("idc"),
-            "php_sessid": cookies.get("PHPSESSID")
+            "sis": {
+                "idc": sis_cookies.get("idc"),
+                "php_sessid": sis_cookies.get("PHPSESSID")
+            },
+            "canteen": canteen_local_storage,
+            "updated": updated
         }
 
-session_data = {}
-session_updated_at = 0
-
-def update_session_data():
-    global session_data, session_updated_at
-    session_data = fetch_session_data()
-    session_updated_at = time.time()
+data = {}
 
 def cache_max_age():
-    if not session_updated_at:
-        return 0
-
-    return max(0, int(session_updated_at + UPDATE_INTERVAL - time.time()))
+    return max(0, int(data["updated"] + UPDATE_INTERVAL - time.time()))
 
 def session_renewer():
     """Periodically obtain new session data"""
+    global data
     while True:
+        time.sleep(UPDATE_INTERVAL)
         print("Renewing session data")
         try:
-            update_session_data()
+            data = fetch_data()
         except Exception as e:
             print(f"Error obtaining new session data: {e}")
-        time.sleep(UPDATE_INTERVAL)
 
 class TokenHandler(http.server.BaseHTTPRequestHandler):
-    def do_OPTIONS(self):
+    def do_OPTIONS(self): # needed to allow the extension to send Authorization header
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Authorization")
+        self.send_header("Access-Control-Max-Age", "86400")
         self.end_headers()
 
     def do_GET(self):
@@ -93,8 +114,7 @@ class TokenHandler(http.server.BaseHTTPRequestHandler):
 
         # Authenticated, can return session data
         print("Valid request")
-        response_data = json.dumps(session_data).encode("utf-8")
-
+        response_data = json.dumps(data).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Cache-Control", f"private, max-age={cache_max_age()}, must-revalidate")
@@ -105,15 +125,16 @@ class TokenHandler(http.server.BaseHTTPRequestHandler):
 
         self.wfile.write(response_data)
 
-    #def log_message(self, format, *args): # Disable request log
-    #    return
 
 if __name__ == "__main__":
     # Get new session now and get another one periodically using a new thread
-    update_session_data()
+    print("Getting initial data...")
+    data = fetch_data()
+    print("Starting renewer thread...")
     threading.Thread(target=session_renewer, daemon=True).start()
 
     # Server
+    print("Starting server...")
     server = http.server.HTTPServer(("0.0.0.0", PORT), TokenHandler)
     print(f"Serving on 0.0.0.0:{PORT}")
     try:
