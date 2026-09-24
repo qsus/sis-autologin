@@ -31,8 +31,13 @@ def fetch_data():
     with sync_playwright() as p:
         ## LOGIN TO CAS
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        context = browser.new_context(
+            locale="cs-CZ",
+            user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        )
+        page = context.new_page()
         # First login screen
+        print("CAS login...")
         page.goto("https://cas.cuni.cz/cas/login")
         page.fill("input[name='username']", USER)
         page.fill("input[name='password']", PASS)
@@ -47,10 +52,12 @@ def fetch_data():
         page.get_by_role("button", name="Přeskočit").click()
 
         ## SIS
+        print("SIS login...")
         page.goto("https://is.cuni.cz/studium/index.php?sso")
         sis_cookies = {c["name"]: c["value"] for c in page.context.cookies()}
 
         ## Canteen
+        print("Septim canteen login...")
         page.goto("https://kam-septim-fe.is.cuni.cz/ext-login")
         # Wait until the auth data appears in localStorage
         canteen_local_storage = page.wait_for_function(
