@@ -7,6 +7,10 @@ from dotenv import load_dotenv
 # Login emulator
 from playwright.sync_api import sync_playwright
 import pyotp
+# Session data encryption
+import base64
+import hashlib
+from cryptography.fernet import Fernet
 
 load_dotenv(override=True) # override ensures USER isn't overriden by the system
 
@@ -16,6 +20,7 @@ USER = os.getenv("USER")
 PASS = os.getenv("PASS")
 # Auth from user
 SECRET = os.getenv("SECRET")
+ENCRYPT = os.getenv("ENCRYPT")
 # Other
 PORT = int(os.getenv("PORT", 7791))
 UPDATE_INTERVAL = int(os.getenv("INTERVAL", 3600))
@@ -91,6 +96,9 @@ def session_renewer():
             print(f"Error obtaining new session data: {e}")
 
 class TokenHandler(http.server.BaseHTTPRequestHandler):
+    key = base64.urlsafe_b64encode(hashlib.sha256(ENCRYPT.encode()).digest())
+    cipher = Fernet(key)
+
     def do_OPTIONS(self): # needed to allow the extension to send Authorization header
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -115,6 +123,11 @@ class TokenHandler(http.server.BaseHTTPRequestHandler):
         # Authenticated, can return session data
         print("Valid request")
         response_data = json.dumps(data).encode("utf-8")
+        if ENCRYPT:
+            print(response_data)
+            response_data = self.cipher.encrypt(response_data)
+            print(response_data)
+
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Cache-Control", f"private, max-age={cache_max_age()}, must-revalidate")
@@ -125,6 +138,10 @@ class TokenHandler(http.server.BaseHTTPRequestHandler):
 
         self.wfile.write(response_data)
 
+    def do_POST(self):
+        global data
+        data = fetch_data()
+        self.send_response(204)
 
 if __name__ == "__main__":
     # Get new session now and get another one periodically using a new thread
