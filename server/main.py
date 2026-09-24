@@ -131,9 +131,7 @@ class TokenHandler(http.server.BaseHTTPRequestHandler):
         print("Valid request")
         response_data = json.dumps(data).encode("utf-8")
         if ENCRYPT:
-            print(response_data)
             response_data = self.cipher.encrypt(response_data)
-            print(response_data)
 
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
