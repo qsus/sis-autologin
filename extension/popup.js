@@ -1,7 +1,8 @@
 // Load saved settings
-chrome.storage.local.get(['url', 'secret', 'enabled', 'registerDevice', 'deviceName', 'otpSeed', 'username', 'password'], (res) => {
+chrome.storage.local.get(['url', 'secret', 'encrypt', 'enabled', 'registerDevice', 'deviceName', 'otpSeed', 'username', 'password'], (res) => {
 	document.getElementById('url').value = res.url || '';
 	document.getElementById('secret').value = res.secret || '';
+	document.getElementById('encrypt').value = res.encrypt || '';
 	document.getElementById('enabled').checked = res.enabled !== false; // Defaults to true on first run
 	document.getElementById('registerDevice').checked = res.registerDevice === true;
 	document.getElementById('deviceName').value = res.deviceName || '';
@@ -14,6 +15,7 @@ chrome.storage.local.get(['url', 'secret', 'enabled', 'registerDevice', 'deviceN
 document.getElementById('save').addEventListener('click', () => {
 	const url = document.getElementById('url').value.trim();
 	const secret = document.getElementById('secret').value.trim();
+	const encrypt = document.getElementById('encrypt').value.trim();
 	const enabled = document.getElementById('enabled').checked;
 	const registerDevice = document.getElementById('registerDevice').checked;
 	const deviceName = document.getElementById('deviceName').value.trim();
@@ -21,7 +23,7 @@ document.getElementById('save').addEventListener('click', () => {
 	const username = document.getElementById('username').value.trim();
 	const password = document.getElementById('password').value.trim();
 	
-	chrome.storage.local.set({ url, secret, enabled, registerDevice, deviceName, otpSeed, username, password, cache: null }, () => {
+	chrome.storage.local.set({ url, secret, encrypt, enabled, registerDevice, deviceName, otpSeed, username, password, cache: null }, () => {
 		const btn = document.getElementById('save');
 		btn.textContent = 'Saved!';
 		setTimeout(() => btn.textContent = 'Save Settings', 1500);
